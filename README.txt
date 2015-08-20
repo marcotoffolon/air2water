@@ -43,10 +43,8 @@ PSO            		! run mode: PSO (Particle Swarm Optimization), LATHYP (Latin Hy
 
 -----> 'PSO.txt'   to be located in the same folder of the executable file of air2water. This file contains the parameters of PSO:
 see e.g.:	
-- Kennedy, J., and R. Eberhart (1995), Particle swarm optimization, in Proceedings of IEEE International Conference
-on Neural Networks, pp. 1942-1948, doi:10.1109/ICNN.1995.488968.
-- Robinson, J., and Y. Rahmat-Samii (2004), Particle swarm optimization in electromagnetics, IEEE T. Antenn. Propag.,
-52, 397-407, doi:10.1109/TAP.2004.823969.
+- Kennedy, J., and R. Eberhart (1995), Particle swarm optimization, in Proceedings of IEEE International Conference on Neural Networks, pp. 1942-1948, doi:10.1109/ICNN.1995.488968.
+- Robinson, J., and Y. Rahmat-Samii (2004), Particle swarm optimization in electromagnetics, IEEE T. Antenn. Propag., 52, 397-407, doi:10.1109/TAP.2004.823969.
 
 ! PSO parameters
 500			! number of particles
@@ -66,14 +64,12 @@ on Neural Networks, pp. 1942-1948, doi:10.1109/ICNN.1995.488968.
 	2001		1		5		10.125		3.254		
 	...
 		
-	NOTE: 	the series of observed air temperature must be complete. It cannot have gaps or no data. 
-		the series of observed water temperature can contain no-data (-999). 
-		Both series are always at daily time scale, as the equation of the model is solved with daily time step. The 		model automatically evaluates weekly, multi-weekly, or monthly averages (of water temperature) when using 
-		different time scales for model calibration. 
+	NOTE: 	The series of observed air temperature must be complete. It cannot have gaps or no data. 
+		The series of observed water temperature can contain no-data (-999). 
+		Both series are always at daily time scale, as the equation of the model is solved with daily time step. The model automatically evaluates weekly, multi-weekly, or monthly averages (of water temperature) when using different time scales for model calibration. 
 	
 -----> file 'parameters.txt'
-	The file contains the range of variation of each parameter of the model. The range of variation of the
-	parameters is lake dependent, and can be estimated using the equations presented in Piccolroaz et al., 2013. 
+	The file contains the range of variation of each parameter of the model. The range of variation of the parameters is lake dependent, and can be estimated using the equations presented in Piccolroaz et al., 2013. 
 	The structure of the file is as follows:
 
 	-0.017   0.00047   0.00069   2   0.005   0   0     0
@@ -82,8 +78,7 @@ on Neural Networks, pp. 1942-1948, doi:10.1109/ICNN.1995.488968.
 	The first line contains the minimum value of each parameters, while the second contains the maximum values. 
 		
 -----> file 'parameters_forward.txt'
-	The file contains a set of parameters to be used to run the model in forward mode (required only if the model is run 
-	in forward), see 10th line of file input.txt . The structure of the file is as follows:
+	The file contains a set of parameters to be used to run the model in forward mode (required only if the model is run	in forward), see 10th line of file input.txt . The structure of the file is as follows:
 
 	 0.000284   0.006668   0.006719   2.888324   0.017322   0.212055 148.709752   0.499891  -1.303755
 
@@ -94,12 +89,8 @@ The model writes the output in a folder called 'output_numberofparameters' (e.g.
 The folder contains:
 
 -----> file '0_PSO_..........   .out'
-	Binary file that contains a matrix with 9 columns. Each row contains the set of parameters (columns 1-8) and the 
-	associated efficiency index (column 9) of each iteration performed by the optimization algorithm. Values are saved in 	double precision.
-	This file allows: a) drawing the dotty plots of parameters to evaluate whether the a priori range of variations of 
-	parameters have been reasonably defined (i.e., not too narrow, not too large), b) evaluating wheter the optimization 
-	(searching) algorithm converged towards the best solution, c) perform uncertainty anayses (when using RANSAM or 
-	LATHYP).
+	Binary file that contains a matrix with 9 columns. Each row contains the set of parameters (columns 1-8) and the 	associated efficiency index (column 9) of each iteration performed by the optimization algorithm. Values are saved in double precision.
+	This file allows: a) drawing the dotty plots of parameters to evaluate whether the a priori range of variations of 	parameters have been reasonably defined (i.e., not too narrow, not too large), b) evaluating wheter the optimization (searching) algorithm converged towards the best solution, c) perform uncertainty anayses (when using RANSAM or	LATHYP).
 	
 -----> file '1_PSO_..........   .out'
 	ASCII file that contains the best set of parameters (1st line) and the value of the efficiency index (2nd line)
