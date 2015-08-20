@@ -1,15 +1,13 @@
-# air2water
-Model to predict Lake Surface Temperature (LST) using air temperature.
-
        .__       ________                  __                
 _____  |__|______\_____  \__  _  _______ _/  |_  ___________ 
 \__  \ |  \_  __ \/  ____/\ \/ \/ /\__  \\   __\/ __ \_  __ \
  / __ \|  ||  | \/       \ \     /  / __ \|  | \  ___/|  | \/
 (____  /__||__|  \_______ \ \/\_/  (____  /__|  \___  >__|   
      \/                  \/             \/          \/       
+A model to predict Lake Surface Temperature (LST) using air temperature.
 Version 1.0 - August 2015
 
-Provided by sebastiano Piccolroaz and Marco Toffolon
+Provided by Sebastiano Piccolroaz and Marco Toffolon
 
 Department of Civil, Environmental, and Mechanical Engineering, University of Trento (Italy)
 email contacts: s.piccolroaz@unitn.it, marco.toffolon@unitn.it
@@ -19,7 +17,7 @@ How to cite:
 - Piccolroaz S., M. Toffolon, and B. Majone (2013), A simple lumped model to convert air temperature into surface water temperature in lakes, Hydrol. Earth Syst. Sci., 17, 3323-3338, doi:10.5194/hess-17-3323-2013
 
 - Toffolon M., S. Piccolroaz, B. Majone, A.M. Soja, F. Peeters, M. Schmid and A. Wüest 2014), Prediction of surface water temperature from air temperature in lakes with different morphology, Limnology and Oceanography, 59(6), 2185-2202, doi: 10.4319/lo.2014.59.6.2185
------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------
  
 How to use air2water 
 
