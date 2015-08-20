@@ -1,0 +1,14 @@
+! File di input principale: dove, cosa e perchè
+Superior		! name of the lake, river, ...
+stndrck			!name/ID of the air station
+mrqtt			! name/ID of the water station   HadGEM2-CCrcp85	 CNRM-CM5hist
+c				    ! type of series: c=continuous, m=mean year
+1d 			    ! time resolution: 1d=daily, nw=n weeks (n=1,2,...), 1m=monthly
+8					! version: 8, 6, 4, 3 parameters
+0					! Threshold temperature for ice formation
+RMS					! objective function: KGE, NSE, RMS
+RK4					! numerical model: RK2, RK4 or EUL 
+PSO					! run: PSO, LATHYP, RANSAM, FORWARD
+0.01				! minimum percentage of data: 0...1 
+500				! n_run
+-999				! mineff_index
