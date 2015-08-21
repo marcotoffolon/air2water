@@ -5,7 +5,7 @@ _____  |__|______\_____  \__  _  _______ _/  |_  ___________
 (____  /__||__|  \_______ \ \/\_/  (____  /__|  \___  >__|   
      \/                  \/             \/          \/       
 A model to predict Lake Surface Temperature (LST) using air temperature.
-Version 1.0 - August 2015
+Version 1.0.0 - August 2015
 
 Provided by Sebastiano Piccolroaz and Marco Toffolon
 
