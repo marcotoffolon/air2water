@@ -362,7 +362,8 @@ ELSE
     WRITE(*,*) 'Controllo superato'
 END IF
     
-WRITE(11,'(<n_par+1>(f10.6,1x))') (par_best(i),i=1,n_par), ei_check
+WRITE(11,'(<n_par>(f10.6,1x))') (par_best(i),i=1,n_par)
+WRITE(11,'(f10.6)') ei_check
     	
 OPEN(UNIT=12,FILE=TRIM(folder)//'/2_'//TRIM(run)//'_'//fun_obj//'_'//TRIM(station)//'_'//series//'c_'//TRIM(time_res)//'.out',STATUS='unknown',ACTION='write')
 DO i=1,n_tot
@@ -392,7 +393,7 @@ WRITE(*,*)  SNGL(mean_obs),SNGL(TSS_obs),SNGL(std_obs)
 
 CALL model
 CALL funcobj(ei)
-WRITE(11,*) ei
+WRITE(11,'(f10.6)') ei
 
 CLOSE(11)
 
