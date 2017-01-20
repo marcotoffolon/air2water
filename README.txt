@@ -10,7 +10,7 @@ Version 2.0.0 - January 2017
 Provided by Sebastiano Piccolroaz and Marco Toffolon
 
 Department of Civil, Environmental, and Mechanical Engineering, University of Trento (Italy)
-email contacts: s.piccolroaz@unitn.it, marco.toffolon@unitn.it
+email contact: s.piccolroaz@unitn.it
 
 How to cite:
 
@@ -37,7 +37,7 @@ How to use air2water
 The model is presented and discussed in Piccolroaz et al. (2013) and in Piccolroaz (2016).
 The present version of air2water is that described in Piccolroaz (2016) and in Toffolon et al. (2014), which coincides with the original version (Piccolroaz et al., 2013), except for some differences in the notation of model parameters. The mathematical model is the same.
 
-Pre-compiled executable files are available for Linux (air2water_2.0.out) and Windows (air2water_2.0.exe) systems.
+Pre-compiled executable files are available for Linux (air2water_v2.0.out) and Windows (air2water_v2.0.exe) systems.
 
 The code is provided with an example test case. The study site is Lake Superior and the data have been downloaded from (downloaded data have been pre-processed):
 - National Oceanic and Atmospheric Administration’s (NOAA) National Data Buoy Center (NDBC, webpage: http://www.ndbc.noaa.gov/) --> daily air temperature (STDM4 – Stannard Rock station);
