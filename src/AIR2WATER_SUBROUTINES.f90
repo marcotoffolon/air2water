@@ -10,29 +10,35 @@ INTEGER:: i, j, k
 REAL(KIND=8) :: ei
 REAL(KIND=8) :: ind, TSS, mean_mod_ymo,mean_obs_ymo
 
-! Richiamo modello conversione
+! air2water
 CALL model
 	
-! Calcolo dell'indice di efficienza
+! Evaluate the objective function
 CALL funcobj(ei)
 
 RETURN
 END
 
 !-------------------------------------------------------------------------------
-!				MODELLO
+!				AIR2WATER
 !-------------------------------------------------------------------------------
 SUBROUTINE model
 USE commondata
 
-! Dichiarazione variabili
+! Variables declaration
 IMPLICIT NONE
 
-INTEGER :: j
-REAL(KIND=8) :: DD, K1, K2, K3, K4
+INTEGER :: j, k
+INTEGER :: nsub
+REAL(KIND=8) :: DD
+REAL(KIND=8) :: K1, K2, K3, K4
+REAL(KIND=8) :: pp, lambda, dt
+REAL(KIND=8) :: dTair , ttt
+REAL(KIND=8) :: Tairk, Tairk1, Twatk, ttk
+REAL(KIND=8) :: alpha, d1, d2, A, B
 
 Tmin=MAX(0.0d0,MINVAL(Twat_obs))
-Tmin=MAX(4.d0,Tmin)	! Calcolo Tmin
+Tmin=MAX(4.d0,Tmin)	! Tmin
 
 IF (Twat_obs(1)==-999) THEN	! Condizione iniziale
 	Twat_mod(1)=Tmin
@@ -40,34 +46,75 @@ ELSE
 	Twat_mod(1)=Twat_obs(1)
 END IF
 
+IF (num_mod .eq. 'CRN') THEN
+    dt = 1.0d0
+    ttt = DoY
+END IF
+        
 DO j=1,n_tot-1
-	
-	IF (num_mod .eq. 'RK4') THEN
-	    CALL RK(Tair(j), Twat_mod(j), tt(j), K1, DD)
-	    delta(j)=DD
-	    CALL RK(0.5d0*(Tair(j) + Tair(j+1)), Twat_mod(j) + 0.5d0*K1, tt(j) + 0.5*ttt, K2, DD)
-	    CALL RK(0.5d0*(Tair(j) + Tair(j+1)), Twat_mod(j) + 0.5d0*K2, tt(j) + 0.5*ttt, K3, DD)
-	    CALL RK(Tair(j+1), Twat_mod(j) + K3, tt(j) + ttt, K4, DD)
-    	
-        Twat_mod(j+1)=Twat_mod(j) + 1.0d0/6.0d0*(K1 + 2.0d0*K2 + 2.0d0*K3 + K4 );	! a rigore: moltiplicato tutto per dt, ma dt=1!
-    ELSEIF (num_mod .eq. 'RK2') THEN
-	    CALL RK(Tair(j), Twat_mod(j), tt(j), K1, DD)
-	    delta(j)=DD
-	    CALL RK(Tair(j+1), Twat_mod(j) + K1, tt(j) + ttt, K2, DD)
-    	
-        Twat_mod(j+1)=Twat_mod(j) + 0.5d0*(K1 + K2);	! a rigore: moltiplicato tutto per dt, ma dt=1!
-    ELSEIF (num_mod .eq. 'EUL') THEN
-	    CALL RK(0.5d0*(Tair(j) + Tair(j+1)), Twat_mod(j), tt(j), K1, DD)
-	    delta(j)=DD
-	    Twat_mod(j+1)=Twat_mod(j) + K1                  ! a rigore: moltiplicato tutto per dt, ma dt=1!
-	ELSE
-	    WRITE(*,*) 'Error in the choice of the numerical model'
-	    STOP
-    END IF
-       
-    Twat_mod(j+1)=MAX(Twat_mod(j+1),Tice_cover);
-    Tmin=MAX(4.d0,MIN(Tmin,Twat_mod(j+1)));
 
+    IF (num_mod .eq. 'CRN') THEN
+        CALL a2w(Tair(j), Twat_mod(j), tt(j), K1, DD, pp)  
+        delta(j)=DD
+        Twatk=( Twat_mod(j)*2.0d0*DD +                     &
+        dt*( pp + par(1) + par(2)*Tair(j+1) + par(5)*cos(2.d0*pi*(tt(j)+ttt-par(6))) ) ) &
+        /(2.0d0*DD+dt*par(3)) ;                                    	
+        Twatk=MAX(Twatk,Tice_cover)                
+    ELSE
+        ! Substepping procedure
+        CALL a2w(Tair(j), Twat_mod(j), tt(j), K1, DD, pp)
+        DD=MAX(DD,0.01d0)
+        lambda=(pp/par(4) - par(3))/DD
+        pp=-LIM/lambda    
+        IF (lambda .le. 0.0d0 .and. pp .lt. 1.0d0) THEN
+            nsub=CEILING(1.0d0/pp)
+            nsub=MIN(100,nsub)
+            dt=1.0d0/nsub           
+        ELSE
+            dt=1.0d0
+            nsub=1 
+        END IF  
+        dTair=(Tair(j+1)-Tair(j))/DBLE(nsub)
+        ttt = DoY/DBLE(nsub)
+            
+	    Twatk=Twat_mod(j)
+	    DO k=1,nsub ! Substepping cycle		
+	        Tairk = Tair(j) + dTair*DBLE(k-1)
+	        Tairk1= Tairk + dTair
+	        ttk=tt(j) + ttt*DBLE(k-1)
+    	    	    		
+	        IF (num_mod .eq. 'RK4') THEN
+	            CALL a2w(Tairk, Twatk, ttk, K1, DD, pp)
+	            delta(j)=DD
+	            CALL a2w(0.5d0*(Tairk + Tairk1), Twatk + 0.5d0*K1, ttk + 0.5*ttt, K2, DD, pp)
+	            CALL a2w(0.5d0*(Tairk + Tairk1), Twatk + 0.5d0*K2, ttk + 0.5*ttt, K3, DD, pp)
+	            CALL a2w(Tairk1, Twatk + K3, ttk + ttt, K4, DD, pp)
+
+                Twatk=Twatk + 1.0d0/6.0d0*(K1 + 2.0d0*K2 + 2.0d0*K3 + K4 )*dt
+            ELSEIF (num_mod .eq. 'RK2') THEN
+	            CALL a2w(Tairk, Twatk, ttk, K1, DD, pp)
+	            delta(j)=DD
+	            CALL a2w(Tairk1, Twatk + K1, ttk + ttt, K2, DD, pp)
+            	
+                Twatk=Twatk + 0.5d0*(K1 + K2)*dt
+            ELSEIF (num_mod .eq. 'EUL') THEN
+	            CALL a2w(0.5d0*(Tairk + Tairk1), Twatk, ttk, K1, DD, pp)
+	            delta(j)=DD
+            	
+	            Twatk=Twatk + K1*dt                    	    
+	        ELSE
+	            WRITE(*,*) 'Error in the choice of the numerical model'
+	            STOP
+            END IF
+            
+            Twatk=MAX(Twatk,Tice_cover)
+            
+        END DO
+    END IF
+    
+    Twat_mod(j+1)=Twatk 
+    Tmin=MAX(4.d0,MIN(Tmin,Twat_mod(j+1)))
+            
 END DO
 
 delta(n_tot) = DD
@@ -75,43 +122,48 @@ delta(n_tot) = DD
 RETURN
 END
 !-------------------------------------------------------------------------------
-!				INTEGRAZIONE NUMERICA
+!				NUMERICAL INTEGRATION
 !-------------------------------------------------------------------------------
-SUBROUTINE RK(Ta, Tw, time, K, DD)
+SUBROUTINE a2w(Ta, Tw, time, K, DD, pp)
 
 USE commondata
 
 IMPLICIT NONE
 
-REAL(KIND=8) :: DD, pp
-REAL(KIND=8), INTENT(OUT) :: K
+REAL(KIND=8) :: lambda
+REAL(KIND=8), INTENT(OUT) :: K, DD, pp
 REAL(KIND=8), INTENT(IN) :: Ta, Tw, time
 
-
-IF (version==4 .or. version==1) THEN
-	pp = par(1)
-ELSE
-	pp = par(5)*COS(2.d0*pi*(time-par(6))) + par(1);
-END IF
 
 IF (Tw>=Tmin) THEN
 	DD=DEXP( -(Tw-Tmin)/par(4) );	
 ELSE
-	IF (version==8 .or. version==9) THEN
+	IF (version=='3') THEN
 		DD=DEXP( (Tw-Tmin)/par(7) ) + DEXP( -Tw/par(8) );	
-	ELSE
+    ELSE
 		DD=1.0d0
 	END IF
 END IF
-      
-K = ( pp + par(2)*Ta -  par(3)*Tw )/DD
+
+pp = par(1) + par(2)*Ta -  par(3)*Tw + par(5)*COS(2.d0*pi*(time-par(6))) ! Note that if version == '1' par(5)==0
+
+!!! lower bound for numerical stability
+!!lambda=pp/par(4) - par(3)
+!!IF (lambda .le. 0.0d0) THEN
+!!    IF (num_mod .eq. 'RK4' .and. DD .lt. -lambda/LIM) THEN
+!!        DD=-lambda/LIM
+!!    ELSEIF ((num_mod .eq. 'RK2' .or. num_mod .eq. 'EUL') .and. DD .lt. -lambda/LIM ) THEN
+!!        DD=-lambda/LIM
+!!    END IF
+!!END IF
+    
+K = pp/DD    
        
 RETURN
 END SUBROUTINE
 
-
 !-------------------------------------------------------------------------------
-!				FUNZIONE OBIETTIVO
+!				OBJECTIVE FUNCTION
 !-------------------------------------------------------------------------------
 SUBROUTINE funcobj(ind)
 ! Subroutine per il calcolo della funzione obiettivo della simulazione
@@ -352,18 +404,18 @@ CALL model
 
 ! Controllo: calcolo dell'indice di efficienza
 CALL funcobj(ei_check)
-WRITE(*,*) 'Indice efficienza calibrazione', ei_check
+WRITE(*,*) 'Calibration: objective function', ABS(ei_check)
 
 IF (ABS(ei_check - finalfit) .gt. 0.0001) THEN
 	    WRITE(*,*) 'Errore efficienza in forward'
 	    WRITE(*,*) ei_check, finalfit
 	    PAUSE
 ELSE
-    WRITE(*,*) 'Controllo superato'
+    WRITE(*,*) 'Check completed'
 END IF
     
 WRITE(11,'(<n_par>(f10.6,1x))') (par_best(i),i=1,n_par)
-WRITE(11,'(f10.6)') ei_check
+WRITE(11,'(f10.6)') ABS(ei_check)
     	
 OPEN(UNIT=12,FILE=TRIM(folder)//'/2_'//TRIM(run)//'_'//fun_obj//'_'//TRIM(station)//'_'//series//'c_'//TRIM(time_res)//'.out',STATUS='unknown',ACTION='write')
 DO i=1,n_tot
@@ -393,9 +445,11 @@ WRITE(*,*)  SNGL(mean_obs),SNGL(TSS_obs),SNGL(std_obs)
 
 CALL model
 CALL funcobj(ei)
-WRITE(11,'(f10.6)') ei
+WRITE(11,'(f10.6)') ABS(ei)
 
 CLOSE(11)
+
+WRITE(*,*) 'Validation: objective function', ABS(ei)
 
 OPEN(UNIT=13,FILE=TRIM(folder)//'/3_'//TRIM(run)//'_'//fun_obj//'_'//TRIM(station)//'_'//series//'v_'//TRIM(time_res)//'.out',STATUS='unknown',ACTION='write')
 DO i=1,n_tot

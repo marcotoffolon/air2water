@@ -5,7 +5,7 @@
 % (____  /__||__|  \_______ \ \/\_/  (____  /__|  \___  >__|
 %      \/                  \/             \/          \/
 % A model to predict Lake Surface Temperature (LST) using air temperature.
-% Version 1.0.0 - August 2015
+% Version 2.0.0 - January 2017
 %
 % Provided by Sebastiano Piccolroaz and Marco Toffolon
 % Department of Civil, Environmental, and Mechanical Engineering, University of Trento (Italy)
@@ -19,13 +19,13 @@ clear all
 clc
 
 %% modify the following lines according to your needs
-folder='Superior/output_8/';
+folder='Superior/output_2/';
 dt='1d';
 IDair='stndrck';
-IDwat='sat';
+IDwat='satt';
 index='RMS';
 runmode='PSO';
-toll=2;  % minimum efficiency index used in the dotty plots (maximum if index = RMS)
+toll=2;  % minimum efficiency index used to make the dotty plots (maximum if index = RMS)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cd ..
@@ -85,25 +85,16 @@ file_cal=['2_' runmode '_' index '_' IDair '_' IDwat '_cc_' dt '.out'];
 file_val=['3_' runmode '_' index '_' IDair '_' IDwat '_cv_' dt '.out'];
 
 T_cal=load([folder file_cal]);
-T_val=load([folder file_val]);
-
 T_cal=T_cal(366:end,:); % the first is a warm up year
-T_val=T_val(366:end,:); % the first is a warm up year
-
 T_cal(T_cal==-999)=NaN;
-T_val(T_val==-999)=NaN;
-
 date_cal=datenum([T_cal(:,1:3)]);
-date_val=datenum([T_val(:,1:3)]);
-
 RMSE_cal=sqrt(nanmean((T_cal(:,5)-T_cal(:,6)).^2));
-RMSE_val=sqrt(nanmean((T_val(:,5)-T_val(:,6)).^2));
 
 figure
-title(['Validation, RMSE=' num2str(RMSE_cal) '°C'])
 plot(date_cal,T_cal(:,4),'.','color',light_blue); hold on
 plot(date_cal,T_cal(:,5),'.','color',blue); 
 plot(date_cal,T_cal(:,6),'.','color',orange); 
+title(['Calibration, RMSE=' num2str(RMSE_cal) '°C'])
 xlabel('Time');
 ylabel('Temperature [°C]');
 legend('Air temperature','Observed water temperature','Simulated water temperature','location','SouthEast')
@@ -112,17 +103,25 @@ set(gcf,'paperunits','centimeters','papersize',[18 10],'paperposition',[0 0 18 1
 print(gcf,'-r300','-dpdf', [folder 'calibration_' runmode '_' index '_' IDair '_' IDwat '.pdf']);
 print(gcf,'-r300','-dpng', [folder 'calibration_' runmode '_' index '_' IDair '_' IDwat '.png']);
 
-figure
-title(['Validation, RMSE=' num2str(RMSE_val) '°C'])
-plot(date_val,T_val(:,4),'.','color',light_blue); hold on
-plot(date_val,T_val(:,5),'.','color',blue); 
-plot(date_val,T_val(:,6),'.','color',orange); 
-xlabel('Time');
-ylabel('Temperature [°C]');
-legend('Air temperature','Observed water temperature','Simulated water temperature','location','SouthEast')
-datetick('x','mmm-yy')
-set(gcf,'paperunits','centimeters','papersize',[18 10],'paperposition',[0 0 18 10]);
-print(gcf,'-r300','-dpdf', [folder 'validation_' runmode '_' index '_' IDair '_' IDwat '.pdf']);
-print(gcf,'-r300','-dpng', [folder 'validation_' runmode '_' index '_' IDair '_' IDwat '.png']);
+if exist([folder file_val],'file')
+    T_val=load([folder file_val]);
+    T_val=T_val(366:end,:); % the first is a warm up year
+    T_val(T_val==-999)=NaN;
+    date_val=datenum([T_val(:,1:3)]);
+    RMSE_val=sqrt(nanmean((T_val(:,5)-T_val(:,6)).^2));
+    
+    figure
+    plot(date_val,T_val(:,4),'.','color',light_blue); hold on
+    plot(date_val,T_val(:,5),'.','color',blue);
+    plot(date_val,T_val(:,6),'.','color',orange);
+    title(['Validation, RMSE=' num2str(RMSE_val) '°C'])
+    xlabel('Time');
+    ylabel('Temperature [°C]');
+    legend('Air temperature','Observed water temperature','Simulated water temperature','location','SouthEast')
+    datetick('x','mmm-yy')
+    set(gcf,'paperunits','centimeters','papersize',[18 10],'paperposition',[0 0 18 10]);
+    print(gcf,'-r300','-dpdf', [folder 'validation_' runmode '_' index '_' IDair '_' IDwat '.pdf']);
+    print(gcf,'-r300','-dpng', [folder 'validation_' runmode '_' index '_' IDair '_' IDwat '.png']);
+end
 
 cd('post_processing')
