@@ -1,5 +1,5 @@
 ! File di input parametri PSO
-500				! n_particelle
+2000				! n_particelle
 2 2	   			! c1 c2
 0.9  0.4    	! wmax wmin
 -999				! mineff_index

@@ -1,3 +1,6 @@
+!-------------------------------------------------------------------------------
+!				SETUP OF THE CALIBRATION 
+!-------------------------------------------------------------------------------
 SUBROUTINE read_calibration
 
 USE commondata
@@ -24,13 +27,13 @@ READ(1,*) run
 READ(1,*) prc
 READ(1,*) n_run
 READ(1,*) mineff_index
+READ(1,*) log_flag
+READ(1,*) CFL
 CLOSE(1)
 
 station=TRIM(air_station)//'_'//TRIM(water_station)
 
-WRITE(string,'(i1)' ) version
-
-folder = TRIM(name)//'/output_'//string//'/'
+folder = TRIM(name)//'/output_'//TRIM(version)//'/'
 result=makedirqq(folder)
     
 WRITE(*,*) 'Objective function ',fun_obj
@@ -57,28 +60,46 @@ IF (run .eq. 'PSO' .or. run .eq. 'LATHYP') THEN
 
     ! parameters that are not used are zeroed
     flag_par=.true.
-    IF (version<=6 .and. version .ne. 1) THEN                    ! air2water 6 parameters
-	    parmin(7)=0;    parmax(7)=0;    flag_par(7)=.false.;
-	    parmin(8)=0;	parmax(8)=0;    flag_par(8)=.false.;
-	    IF (version==4) THEN                ! air2water 4 parameters
-		    parmin(5)=0;    parmax(5)=0;        flag_par(5)=.false.;
-		    parmin(6)=0;	parmax(6)=0;        flag_par(6)=.false.;
-	    END IF
+    IF (version == '1') THEN            ! air2water 4 parameters
+		parmin(5)=0;     parmax(5)=0;     flag_par(5)=.false.;
+	    parmin(6)=0;	 parmax(6)=0;     flag_par(6)=.false.;
+    	parmin(7)=0;     parmax(7)=0;     flag_par(7)=.false.;
+        parmin(8)=0; 	 parmax(8)=0;     flag_par(8)=.false.;
+    ELSEIF (version == '2') THEN        ! air2water 6 parameters
+    	parmin(7)=0;     parmax(7)=0;     flag_par(7)=.false.;
+        parmin(8)=0; 	 parmax(8)=0;     flag_par(8)=.false.; 
     END IF
+        
+    n_parcal=0    
+    DO i=1,n_par
+        IF (flag_par(i)==.true.) THEN
+            n_parcal=n_parcal+1
+        END IF
+    END DO
+    norm_min=SQRT(n_parcal*0.01)   ! 0.01 --> 1%
     
-    IF (version==1) THEN
-    		parmin(5)=0;    parmax(5)=0;        flag_par(5)=.false.;
-		    parmin(6)=0;	parmax(6)=0;        flag_par(6)=.false.;
-    END IF
     CLOSE(1)
     	
     ! write parameters
     OPEN(unit=2,file=TRIM(folder)//'/parameters.txt',status='unknown',action='write')
-    WRITE(2,'(I2,A)') n_par, '   !numero parametri'
     WRITE(2,'(<n_par>(F10.5,1x))') (parmin(i),i=1,n_par)
     WRITE(2,'(<n_par>(F10.5,1x))') (parmax(i),i=1,n_par)
     CLOSE(2)
+    
+    IF (log_flag==1) THEN
+        parmin(2)=DLOG(parmin(2)); parmax(2)=DLOG(parmax(2));
+        parmin(3)=DLOG(parmin(3)); parmax(3)=DLOG(parmax(3));
+    END IF
+    
 END IF
+
+! Limits for numerical stability
+IF (num_mod .eq. 'RK4') THEN
+    LIM=2.785d0*CFL
+ELSEIF (num_mod .eq. 'RK2' .or.  num_mod .eq. 'EUL' ) THEN
+    LIM=2.0d0*CFL
+END IF
+
 
 ! read T series (calibration)
 CALL read_Tseries('c')
@@ -87,7 +108,7 @@ RETURN
 END
 
 !-------------------------------------------------------------------------------
-!				LETTURA PERIODO VALIDAZIONE
+!				SETUP OF THE VALIDATION
 !-------------------------------------------------------------------------------
 SUBROUTINE read_validation
 
@@ -105,7 +126,7 @@ RETURN
 END
 
 !-------------------------------------------------------------------------------
-!				LETTURA FILE TEMPERATURA
+!				READ TEMPERATURE SERIES
 !-------------------------------------------------------------------------------
 SUBROUTINE read_Tseries(p)
 

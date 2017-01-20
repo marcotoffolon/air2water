@@ -11,13 +11,13 @@ WRITE(*,*) '\__  \ |  \_  __ \/  ____/\ \/ \/ /\__  \\   __\/ __ \_  __ \'
 WRITE(*,*) ' / __ \|  ||  | \/       \ \     /  / __ \|  | \  ___/|  | \/'
 WRITE(*,*) '(____  /__||__|  \_______ \ \/\_/  (____  /__|  \___  >__|   '
 WRITE(*,*) '     \/                  \/             \/          \/       '
-WRITE(*,*) 'Version 1.0.0 - August 2015'
+WRITE(*,*) 'Version 2.0.0 - January 2017'
 WRITE(*,*) 
 WRITE(*,*) 
 WRITE(*,*) 
 !-------------------------------------------------------------------------------------
 !
-! Provided by sebastiano Piccolroaz and Marco Toffolon
+! Provided by Sebastiano Piccolroaz and Marco Toffolon
 !
 ! Department of Civil, Environmental, and Mechanical Engineering, University of Trento (Italy)
 ! email contacts: s.piccolroaz@unitn.it, marco.toffolon@unitn.it
@@ -31,6 +31,14 @@ WRITE(*,*)
 ! Toffolon M., S. Piccolroaz, B. Majone, A.M. Soja, F. Peeters, M. Schmid and A. Wüest 
 ! (2014), Prediction of surface water temperature from air temperature in lakes with 
 ! different morphology, Limnology and Oceanography, 59(6), 2185-2202, doi: 10.4319/lo.2014.59.6.2185
+! 
+! Piccolroaz S., M. Toffolon, and B. Majone (2015), The role of stratification on lakes’ thermal
+! response: The case of Lake Superior, Water Resources Research, 51(10):7878–7894,
+! DOI:10.1002/2014WR016555
+!
+! Piccolroaz S. (2016), Prediction of lake surface temperature using the air2water model: 
+! guidelines, challenges, and future perspectives, Advances in Oceanography and Limnology,
+! 7:36-50, DOI: http://dx.doi.org/10.4081/aiol.2016.5791
 !-------------------------------------------------------------------------------------
 
 CALL CPU_TIME(T1)
@@ -55,6 +63,7 @@ WRITE(*,*)  SNGL(mean_obs),SNGL(TSS_obs),SNGL(std_obs)
 
 OPEN(UNIT=11,FILE=TRIM(folder)//'/1_'//TRIM(run)//'_'//fun_obj//'_'//TRIM(station)//'_'//series//'_'//TRIM(time_res)//'.out',STATUS='unknown',ACTION='write')
 
+ii=0
 IF (run .eq. 'FORWARD') THEN
     CALL forward_mode
 ELSE IF (run .eq. 'PSO') THEN
@@ -62,6 +71,10 @@ ELSE IF (run .eq. 'PSO') THEN
 ELSE IF (run .eq. 'LATHYP') THEN
     CALL LH_mode
 END IF
+
+OPEN(UNIT=99,FILE=TRIM(folder)//'/00_'//TRIM(run)//'_'//fun_obj//'_'//TRIM(station)//'_'//series//'_'//TRIM(time_res)//'.out',STATUS='unknown',ACTION='write')
+WRITE(99,*) ii
+CLOSE(99)
 
 ! lancio in forward con il set di parametri migliore  
 CALL forward
