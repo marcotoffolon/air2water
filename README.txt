@@ -21,6 +21,8 @@ How to cite:
 - Toffolon M., S. Piccolroaz, and B. Majone (2015), The role of stratification on lakes' thermal response: The case of Lake Superior, Water Resources Research, 51(10), 7878-7894, doi:10.1002/2014WR016555 
 
 - Piccolroaz S. (2016), Prediction of lake surface temperature using the air2water model: guidelines, challenges, and future perspectives, Advances in Oceanography and Limnology, 7:36-50, DOI: http://dx.doi.org/10.4081/aiol.2016.5791
+
+- Piccolroaz S, N.C. Healey, J.D. Lenters, S.G. Schladow, S.J. Hook, G.B. Sahoo, and M. Toffolon (2017), On the predictability of lake surface temperature using air temperature in a changing climate: A case study for Lake Tahoe (U.S.A.), Limnology and Oceanography, in press, doi:10.1002/lno.10626
 -----------------------------------------------------------------------------------------------------------------------------------------
 What is new in air2water Version 2.0.0
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -29,6 +31,8 @@ In this new release, the main improvement concerns:
   The first three schemes are explicit, and in summer, when δ→0, it may happen that a daily time step is too large to adequately integrate the equation of the model, possibly generating numerical instabilities. In order to avoid this situation, an adaptive sub-stepping procedure has been implemented to avoid numerical instabilities when using Runge-Kutta and forward Euler numerical schemes. 
   The last numerical scheme is implicit, 2nd order accurate, and unconditionally stable: a sub-stepping procedure is not required and the daily time step is used for the whole simulation, making it generally faster (but less accurate than Runge-Kutta 4th order) than the previous schemes.
 - A new pre-processor is available for evaluating the a-priori range of variation of parameters given the mean depth of a lake.
+
+IMPORTANT NOTE: do not change the encoding of input files. They must be ANSI text files. UTF-8 encoded files cannot be read. I suggest using a simple text editor as Notepad++.
 
  
 How to use air2water 
@@ -43,6 +47,7 @@ The code is provided with an example test case. The study site is Lake Superior 
 - National Oceanic and Atmospheric Administration’s (NOAA) National Data Buoy Center (NDBC, webpage: http://www.ndbc.noaa.gov/) --> daily air temperature (STDM4 – Stannard Rock station);
 - National Oceanic and Atmospheric Administration’s (NOAA) Great Lakes Environmental Research Laboratory (GLERL, webpage: http://www.glerl.noaa.gov/) --> daily lake surface temperature (satellite-derived LST averaged over the whole lake).
 
+IMPORTANT NOTE: do not change the encoding of input files. They must be ANSI text files. UTF-8 encoded files cannot be read. I suggest using a simple text editor as Notepad++.
 
 1. Input files
   1.1 -----> 'input.txt' to be located in the same folder of the executable file. This file contains the input information:
@@ -160,6 +165,6 @@ The figures produced by the post-processing script are:
 The range of parameters should be carefully checked during the post-processing step through the analysis of the dotty plots: the cloud of points should be centred within the searching domain, and in any case the best set of parameters should be sufficiently far from the upper and lower a-priori bounds. Exceptions are represented by parameters p6 and p7, see Piccolroaz et al. (2013), Toffolon et al. (2014), and Piccolroaz (2016). 
   
 
-Trento, 20 January, 2017
+Trento, 2 September, 2017
 Sebastiano Piccolroaz
 s.piccolroaz@unitn.it
