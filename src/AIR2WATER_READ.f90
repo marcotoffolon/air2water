@@ -181,6 +181,9 @@ ALLOCATE(delta(n_tot),stat=status)
 
 DO i=366,n_tot
 	READ(3,*) (date(i,j),j=1,3),Tair(i),Twat_obs(i)
+	IF (Twat_obs(i) .lt. 0 .and. Twat_obs(i) .ne. -999)
+	    Twat_obs(i)=0.0d0
+	END IF
 END DO
 date(1:365,:)=-999
 Tair(1:365)=Tair(366:730)
