@@ -32,8 +32,9 @@ In this new release, the main improvement concerns:
   The last numerical scheme is implicit, 2nd order accurate, and unconditionally stable: a sub-stepping procedure is not required and the daily time step is used for the whole simulation, making it generally faster (but less accurate than Runge-Kutta 4th order) than the previous schemes.
 - A new pre-processor is available for evaluating the a-priori range of variation of parameters given the mean depth of a lake.
 
+!!!!!!!!!!!!!!!
 IMPORTANT NOTE: do not change the encoding of input files. They must be ANSI text files. UTF-8 encoded files cannot be read. I suggest using a simple text editor as Notepad++.
-
+!!!!!!!!!!!!!!!
  
 How to use air2water 
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -92,6 +93,7 @@ IMPORTANT NOTE: do not change the encoding of input files. They must be ANSI tex
 				
 			NOTE: 	The series of observed air temperature must be complete. It cannot have gaps or no data. 
 				The series of observed water temperature can contain no-data (-999). 
+				The series of data must start on the 1st of January. If data are available after that date, air temperature should be reconstructed and the value -999 assigned to water temperature.
 				Both series are always at daily time scale, as the equation of the model is solved with daily time step. The model automatically evaluates weekly, multi-weekly, or monthly averages (of water temperature) when using different time scales for model calibration. 
 			
 	  1.3.2 -----> file 'parameters.txt'
