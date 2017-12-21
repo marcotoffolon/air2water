@@ -7,9 +7,12 @@
 % A model to predict Lake Surface Temperature (LST) using air temperature.
 % Version 2.0.0 - January 2017
 %
-% Provided by Sebastiano Piccolroaz and Marco Toffolon
+% Provided by Sebastiano Piccolroaz* and Marco Toffolon
 % Department of Civil, Environmental, and Mechanical Engineering, University of Trento (Italy)
 % email contacts: s.piccolroaz@unitn.it, marco.toffolon@unitn.it
+%
+% * now at Institute for Marine and Atmospheric Research, Utrecht
+% University, The Netherlands. s.piccolroaz@uu.nl
 
 % POST-PROCESSING
 % Aim: to analyze and plot the results
@@ -22,7 +25,7 @@ clc
 folder='Superior/output_2/';
 dt='1d';
 IDair='stndrck';
-IDwat='satt';
+IDwat='sat';
 index='RMS';
 runmode='PSO';
 toll=2;  % minimum efficiency index used to make the dotty plots (maximum if index = RMS)
@@ -61,24 +64,29 @@ else
     plot_limits=[toll best_eff*1.1];
 end
 
+disp('Warning: processing the dotty plot figure may take a few minutes depending on the number of points')
+dp_flag=input('Do you want to continue with the figure (0=N, 1=Y)?'); 
 
-figure; hold on
-for i=1:8
-    subplot(2,4,i)
-    plot(parset(:,i),eff,'.k'); hold on
-    plot(parset(I_best,i),best_eff,'.','color',orange,'markersize',15)
-    ylim(plot_limits);
-    xlabel(['par' num2str(i)]);
-    if strcmp(index,'RMS')==1
-        ylabel([index '[°C]'])
-    else
-        ylabel(index);
-    end
+if dp_flag
+	figure; hold on
+	pause
+	for i=1:8
+		subplot(2,4,i)
+		plot(parset(:,i),eff,'.k'); hold on
+		plot(parset(I_best,i),best_eff,'.','color',orange,'markersize',15)
+		ylim(plot_limits);
+		xlabel(['par' num2str(i)]);
+		if strcmp(index,'RMS')==1
+			ylabel([index '[°C]'])
+		else
+			ylabel(index);
+		end
+	end
+
+	set(gcf,'paperunits','centimeters','papersize',[18 10],'paperposition',[0 0 18 10]);
+	print(gcf,'-r300','-dpdf', [folder 'dottyplots_' runmode '_' index '_' IDair '_' IDwat '.pdf']);
+	print(gcf,'-r300','-dpng', [folder 'dottyplots_' runmode '_' index '_' IDair '_' IDwat '.png']);
 end
-
-set(gcf,'paperunits','centimeters','papersize',[18 10],'paperposition',[0 0 18 10]);
-print(gcf,'-r300','-dpdf', [folder 'dottyplots_' runmode '_' index '_' IDair '_' IDwat '.pdf']);
-print(gcf,'-r300','-dpng', [folder 'dottyplots_' runmode '_' index '_' IDair '_' IDwat '.png']);
 
 %% 2. Series
 file_cal=['2_' runmode '_' index '_' IDair '_' IDwat '_cc_' dt '.out'];
